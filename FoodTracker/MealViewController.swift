@@ -14,12 +14,18 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var ratingControl: RatingControl!
+    @IBOutlet weak var saveButton: UIBarButtonItem!
+    
+    var meal: Meal?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Handle the text field's user input through delegate callbacks
         nameTextField.delegate = self
+        
+        // Enable the save button only if the user enters a valid name
+        checkValidMealName()
         
     }
     
@@ -35,7 +41,46 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         
     }
     
+    func textFieldDidBeginEditing(textField: UITextField) {
+        
+        // Disable the save button
+        saveButton.enabled = false
+        
+    }
+    
+    func checkValidMealName() {
+        
+        let text = nameTextField.text ?? ""
+        saveButton.enabled = !text.isEmpty
+        
+    }
+    
     func textFieldDidEndEditing(textField: UITextField) {
+        
+        checkValidMealName()
+        navigationItem.title = textField.text
+        
+    }
+    
+    
+    // MARK: Navigation
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if sender === saveButton {
+            let name = nameTextField.text ?? ""
+            let photo = photoImageView.image
+            let rating = ratingControl.rating
+            
+            // Set the meal to be passed to MealTableViewController after the unwind
+            meal = Meal(name: name, photo: photo, rating: rating)
+        }
+        
+    }
+    
+    @IBAction func cancel(sender: UIBarButtonItem) {
+        
+        dismissViewControllerAnimated(true, completion: nil)
         
     }
     
